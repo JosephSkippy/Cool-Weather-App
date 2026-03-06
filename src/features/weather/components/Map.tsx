@@ -1,7 +1,7 @@
 import "@maptiler/leaflet-maptilersdk";
 import { MaptilerLayer } from "@maptiler/leaflet-maptilersdk";
 import type { LeafletMouseEvent } from "leaflet";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { MapContainer, Marker, TileLayer, useMap } from "react-leaflet";
 import type { Coord } from "../coord";
 import type { MapType } from "./dropdowns/MapTypeDropdown";
@@ -70,12 +70,32 @@ function MapPanToCoord({ coord }: { coord: Coord }) {
   return null;
 }
 
+function useTheme() {
+  const [dark, setDark] = useState(() =>
+    document.documentElement.classList.contains("dark"),
+  );
+
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+      setDark(document.documentElement.classList.contains("dark"));
+    });
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+    return () => observer.disconnect();
+  }, []);
+
+  return dark;
+}
+
 function MapTiles() {
   const map = useMap();
+  const dark = useTheme();
 
   useEffect(() => {
     const mtLayer = new MaptilerLayer({
-      style: "basic-dark",
+      style: dark ? "basic-dark" : "basic-v2",
       apiKey: MAPTILES_API_KEY,
     });
     mtLayer.addTo(map);
@@ -83,7 +103,7 @@ function MapTiles() {
     return () => {
       map.removeLayer(mtLayer);
     };
-  }, [map]);
+  }, [map, dark]);
 
   return null;
 }
