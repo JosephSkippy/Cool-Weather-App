@@ -18,9 +18,9 @@ import DailySkeletons from "./features/weather/components/skeletons/DailySkeleto
 import type { Coord } from "./features/weather/coord";
 
 function App() {
-  const [coordinates, setCoord] = useState<Coord>({ lat: 35.67, lng: 139.65 });
+  const [coordinates, setCoord] = useState<Coord>({ lat: 1.35, lng: 103.82 });
   const [mode, setMode] = useState<"map" | "geocode">("map");
-  const [city, setCity] = useState<string>("Tokyo");
+  const [city, setCity] = useState<string>("Singapore");
   const [mapType, selectMapType] = useState<MapType>("none");
 
   const mapClick = (lat: number, lng: number) => {
