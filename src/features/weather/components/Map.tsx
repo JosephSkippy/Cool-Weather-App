@@ -10,7 +10,7 @@ import { MapContainer, Marker, TileLayer, useMap } from "react-leaflet";
 import type { Coord } from "../coord";
 import type { MapType } from "./dropdowns/MapTypeDropdown";
 
-// Fix Leaflet default marker icons broken by bundlers
+// Fix Leaflet default marker icons broken by bundler
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconUrl: markerIcon,
