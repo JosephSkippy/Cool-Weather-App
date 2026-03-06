@@ -9,7 +9,7 @@ export default function WeatherIcon({ img, className }: Props) {
   return (
     <img
       className={clsx("size-8", className)}
-      src={`http://openweathermap.org/img/wn/${img}.png`}
+      src={`https://openweathermap.org/img/wn/${img}@2x.png`}
       alt="weather icon"
     />
   );

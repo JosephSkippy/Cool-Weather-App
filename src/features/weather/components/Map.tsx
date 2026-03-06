@@ -1,10 +1,10 @@
+import "@maptiler/leaflet-maptilersdk";
+import { MaptilerLayer } from "@maptiler/leaflet-maptilersdk";
 import type { LeafletMouseEvent } from "leaflet";
 import { useEffect } from "react";
 import { MapContainer, Marker, TileLayer, useMap } from "react-leaflet";
 import type { Coord } from "../coord";
 import type { MapType } from "./dropdowns/MapTypeDropdown";
-import "@maptiler/leaflet-maptilersdk";
-import { MaptilerLayer } from "@maptiler/leaflet-maptilersdk";
 
 const API_KEY = import.meta.env.VITE_OPENWEATHER_API_KEY;
 const zoomLevel = 5;
@@ -21,7 +21,7 @@ export default function Map({ coord, onMapClick, mapType }: Props) {
     <MapContainer
       center={coord}
       zoom={zoomLevel}
-      style={{ height: "500px", width: "100%" }}
+      style={{ height: "100%", width: "100%" }}
     >
       <MapClick onMapClick={onMapClick} />
       <MapPanToCoord coord={coord} />

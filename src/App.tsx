@@ -1,19 +1,20 @@
+import { useQuery } from "@tanstack/react-query";
+import { Suspense, useState } from "react";
+import { TooltipProvider } from "./components/ui/tooltip";
+import { getCoordinate } from "./features/weather/api/geocoding";
+import AdditionalInfo from "./features/weather/components/cards/AdditionalInfo";
+import CurrentForecast from "./features/weather/components/cards/CurrentForecast";
 import DailyForecast from "./features/weather/components/cards/DailyForecast";
 import HourlyForecast from "./features/weather/components/cards/HourlyForecast";
-import CurrentForecast from "./features/weather/components/cards/CurrentForecast";
-import AdditionalInfo from "./features/weather/components/cards/AdditionalInfo";
-import Map from "./features/weather/components/Map";
-import { useState, Suspense } from "react";
-import type { Coord } from "./features/weather/coord";
 import LocationDropdown from "./features/weather/components/dropdowns/LocationDropdown";
-import { useQuery } from "@tanstack/react-query";
-import { getCoordinate } from "./features/weather/api/geocoding";
 import type { MapType } from "./features/weather/components/dropdowns/MapTypeDropdown";
 import MapTypeDropdown from "./features/weather/components/dropdowns/MapTypeDropdown";
+import Map from "./features/weather/components/Map";
 import MapLegend from "./features/weather/components/MapLegend";
+import SideBar from "./features/weather/components/SideBar";
 import CurrentSkeletons from "./features/weather/components/skeletons/CurrentSkeletons";
 import DailySkeletons from "./features/weather/components/skeletons/DailySkeletons";
-import SideBar from "./features/weather/components/SideBar";
+import type { Coord } from "./features/weather/coord";
 
 function App() {
   const [coordinates, setCoord] = useState<Coord>({ lat: 35.67, lng: 139.65 });
@@ -47,32 +48,57 @@ function App() {
   const shouldShowLegend = mapType !== "none";
 
   return (
-    <>
-      <div className="flex flex-col gap-2">
-        <LocationDropdown city={city} onSelectLocation={selectLocation} />
-        <MapTypeDropdown mapType={mapType} onSelectMapType={selectMapType} />
-        <div className="flex relative">
-          <Map coord={coord} onMapClick={mapClick} mapType={mapType} />
-          {shouldShowLegend && <MapLegend mapType={mapType} />}
+    <TooltipProvider>
+      <div className="flex flex-col gap-3 px-6 py-3 w-[calc(100dvw-var(--sidebar-width))] h-screen overflow-hidden">
+        <div className="flex items-center gap-4 px-3 py-1 rounded-lg bg-card/50 backdrop-blur-sm border dark:border-none shadow-sm">
+          <div className="flex items-center gap-1.5">
+            <span className="text-xs font-medium text-muted-foreground">
+              Location
+            </span>
+            <LocationDropdown city={city} onSelectLocation={selectLocation} />
+          </div>
+          <div className="w-px h-4 bg-border" />
+          <div className="flex items-center gap-1.5">
+            <span className="text-xs font-medium text-muted-foreground">
+              Map Type
+            </span>
+            <MapTypeDropdown
+              mapType={mapType}
+              onSelectMapType={selectMapType}
+            />
+          </div>
         </div>
-        <Suspense fallback={<CurrentSkeletons />}>
-          <CurrentForecast coord={coord} />
-        </Suspense>
-
-        <Suspense fallback={<CurrentSkeletons />}>
-          <HourlyForecast coord={coord} />
-        </Suspense>
-        <Suspense fallback={<DailySkeletons />}>
-          <DailyForecast coord={coord} />
-        </Suspense>
-        <Suspense fallback={<CurrentSkeletons />}>
-          <AdditionalInfo coord={coord} />
-        </Suspense>
+        <div className="grid flex-1 min-h-0 grid-cols-4 grid-rows-[1fr_minmax(0,180px)_minmax(0,180px)] gap-4">
+          <div className="relative col-span-4 min-h-0">
+            <Map coord={coord} onMapClick={mapClick} mapType={mapType} />
+            {shouldShowLegend && <MapLegend mapType={mapType} />}
+          </div>
+          <div className="col-span-1 row-span-2">
+            <Suspense fallback={<CurrentSkeletons />}>
+              <CurrentForecast coord={coord} />
+            </Suspense>
+          </div>
+          <div className="col-span-2">
+            <Suspense fallback={<CurrentSkeletons />}>
+              <HourlyForecast coord={coord} />
+            </Suspense>
+          </div>
+          <div className="col-span-1 row-span-2">
+            <Suspense fallback={<DailySkeletons />}>
+              <DailyForecast coord={coord} />
+            </Suspense>
+          </div>
+          <div className="col-span-2">
+            <Suspense fallback={<CurrentSkeletons />}>
+              <AdditionalInfo coord={coord} />
+            </Suspense>
+          </div>
+        </div>
       </div>
       <Suspense>
         <SideBar coord={coord} />
       </Suspense>
-    </>
+    </TooltipProvider>
   );
 }
 

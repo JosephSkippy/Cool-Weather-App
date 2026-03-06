@@ -1,8 +1,17 @@
-import { Suspense } from "react";
-import { getAirPolution } from "../api/getAirPolution";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Slider } from "@/components/ui/slider";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import type { Coord } from "../coord";
+import clsx from "clsx";
+import { Info } from "lucide-react";
+import { Suspense } from "react";
 import { mapToWeather } from "../api/adapters";
+import { getAirPolution } from "../api/getAirPolution";
+import type { Coord } from "../coord";
 import Card from "./cards/Card";
 
 type Props = {
@@ -11,42 +20,215 @@ type Props = {
 
 export default function SideBar({ coord }: Props) {
   return (
-    <div className="fixed top-0 right-0 h-screen w-90 z-1001 bg-sidebar shadow-md py-4 px-4">
-      <Suspense>
+    <div className="fixed top-0 right-0 h-screen w-(--sidebar-width) shadow-md bg-sidebar z-1001 py-8 px-4 overflow-y-scroll">
+      <Suspense fallback={<SideBarSkeleton />}>
         <AirPollution coord={coord} />
       </Suspense>
     </div>
   );
 }
 
-function AirPollution({ coord }: { coord: Coord }) {
-  console.log("adapter", coord);
+function SideBarSkeleton() {
+  return (
+    <div className="flex flex-col gap-4">
+      <Skeleton className="h-8 w-40" />
+      <Skeleton className="h-12 w-20" />
+      <Skeleton className="h-6 w-24" />
+      {Array.from({ length: 8 }).map((_, i) => (
+        <Skeleton key={i} className="h-32 w-full rounded-xl" />
+      ))}
+    </div>
+  );
+}
+
+function AirPollution({ coord }: Props) {
   const { data } = useSuspenseQuery({
     queryKey: ["airpollution", coord],
     queryFn: () => getAirPolution(mapToWeather(coord)),
   });
 
   return (
-    <Card>
-      <div className="flex flex-col gap-3">
-        {data["list"].map(unParseObject)}
+    <div className="flex flex-col gap-4">
+      <h1 className="text-2xl font-semibold">Air Pollution</h1>
+      <h1 className="text-5xl font-semibold">{data.list[0].main.aqi}</h1>
+      <div className="flex items-center gap-2">
+        <h1 className="text-2xl font-semibold">AQI</h1>
+        <Tooltip>
+          <TooltipTrigger>
+            <Info className="size-4" />
+          </TooltipTrigger>
+          <TooltipContent className="z-2000">
+            <p className="max-w-xs">
+              Air Quality Index. Possible values: 1, 2, 3, 4, 5. Where 1 = Good,
+              2 = Fair, 3 = Moderate, 4 = Poor, 5 = Very Poor.
+            </p>
+          </TooltipContent>
+        </Tooltip>
       </div>
-    </Card>
+
+      {Object.entries(data.list[0].components).map(([key, value]) => {
+        const pollutant =
+          airQualityRanges[key.toUpperCase() as keyof typeof airQualityRanges];
+
+        const max = Math.max(pollutant["Very Poor"].min, value);
+
+        const currentLevel = (() => {
+          for (const [level, range] of Object.entries(pollutant)) {
+            if (
+              value >= range.min &&
+              (range.max === null || value <= range.max)
+            )
+              return level;
+          }
+          return "Very Poor";
+        })();
+
+        const qualityColor = (() => {
+          switch (currentLevel) {
+            case "Good":
+              return "bg-green-500";
+            case "Fair":
+              return "bg-yellow-500";
+            case "Moderate":
+              return "bg-orange-500";
+            case "Poor":
+              return "bg-red-500";
+            case "Very Poor":
+              return "bg-purple-500";
+            default:
+              return "bg-zinc-500";
+          }
+        })();
+
+        return (
+          <Card
+            key={key}
+            childrenClassName="flex flex-col gap-3"
+            className="hover:scale-105 transition-transform duration-300 from-sidebar-accent to-sidebar-accent/60 gap-0!"
+          >
+            <div className="flex justify-between">
+              <div className="flex items-center gap-2">
+                <span className="text-lg font-bold capitalize">{key}</span>
+                <Tooltip>
+                  <TooltipTrigger>
+                    <Info className="size-4" />
+                  </TooltipTrigger>
+                  <TooltipContent className="z-2000">
+                    <p className="max-w-xs">
+                      Concentration of{" "}
+                      {pollutantNameMapping[key.toUpperCase() as Pollutant]}
+                    </p>
+                  </TooltipContent>
+                </Tooltip>
+              </div>
+              <span className="text-lg font-semibold">{value}</span>
+            </div>
+            <Slider min={0} max={max} value={[value]} disabled />
+            <div className="flex justify-between text-xs">
+              <p>0</p>
+              <p>{max}</p>
+            </div>
+            <div className="flex justify-between">
+              {Object.keys(pollutant).map((quality) => (
+                <span
+                  key={quality}
+                  className={clsx(
+                    "px-2 py-1 rounded-md text-xs font-medium",
+                    quality === currentLevel
+                      ? qualityColor
+                      : "bg-muted text-muted-foreground",
+                  )}
+                >
+                  {quality}
+                </span>
+              ))}
+            </div>
+          </Card>
+        );
+      })}
+    </div>
   );
 }
 
-function unParseObject(obj: Record<string, any>) {
-  return Object.entries(obj["components"]).map(([key, value]) => {
-    return (
-      <div
-        key={key}
-        className="transition-transform hover:scale-105 duration-300 bg-linear-to-br from-sidebar-accent to-sidebar-accent/60"
-      >
-        <div className="flex justify-between">
-          <span className="text-lg font-bold capitalize">{key}</span>
-          <div className="text-lg font-bold capitalize">{String(value)}</div>
-        </div>
-      </div>
-    );
-  });
+// --- Air quality range data ---
+
+type AirQualityLevel = "Good" | "Fair" | "Moderate" | "Poor" | "Very Poor";
+
+interface Range {
+  min: number;
+  max: number | null;
 }
+
+type Pollutant = "SO2" | "NO2" | "PM10" | "PM2_5" | "O3" | "CO" | "NO" | "NH3";
+
+type AirQualityRanges = Record<Pollutant, Record<AirQualityLevel, Range>>;
+
+const airQualityRanges: AirQualityRanges = {
+  SO2: {
+    Good: { min: 0, max: 20 },
+    Fair: { min: 20, max: 80 },
+    Moderate: { min: 80, max: 250 },
+    Poor: { min: 250, max: 350 },
+    "Very Poor": { min: 350, max: null },
+  },
+  NO2: {
+    Good: { min: 0, max: 40 },
+    Fair: { min: 40, max: 70 },
+    Moderate: { min: 70, max: 150 },
+    Poor: { min: 150, max: 200 },
+    "Very Poor": { min: 200, max: null },
+  },
+  PM10: {
+    Good: { min: 0, max: 20 },
+    Fair: { min: 20, max: 50 },
+    Moderate: { min: 50, max: 100 },
+    Poor: { min: 100, max: 200 },
+    "Very Poor": { min: 200, max: null },
+  },
+  PM2_5: {
+    Good: { min: 0, max: 10 },
+    Fair: { min: 10, max: 25 },
+    Moderate: { min: 25, max: 50 },
+    Poor: { min: 50, max: 75 },
+    "Very Poor": { min: 75, max: null },
+  },
+  O3: {
+    Good: { min: 0, max: 60 },
+    Fair: { min: 60, max: 100 },
+    Moderate: { min: 100, max: 140 },
+    Poor: { min: 140, max: 180 },
+    "Very Poor": { min: 180, max: null },
+  },
+  CO: {
+    Good: { min: 0, max: 4400 },
+    Fair: { min: 4400, max: 9400 },
+    Moderate: { min: 9400, max: 12400 },
+    Poor: { min: 12400, max: 15400 },
+    "Very Poor": { min: 15400, max: null },
+  },
+  NO: {
+    Good: { min: 0, max: 20 },
+    Fair: { min: 20, max: 40 },
+    Moderate: { min: 40, max: 60 },
+    Poor: { min: 60, max: 80 },
+    "Very Poor": { min: 80, max: null },
+  },
+  NH3: {
+    Good: { min: 0, max: 40 },
+    Fair: { min: 40, max: 70 },
+    Moderate: { min: 70, max: 150 },
+    Poor: { min: 150, max: 200 },
+    "Very Poor": { min: 200, max: null },
+  },
+};
+
+const pollutantNameMapping: Record<Pollutant, string> = {
+  SO2: "Sulfur dioxide",
+  NO2: "Nitrogen dioxide",
+  PM10: "Particulate matter 10",
+  PM2_5: "Fine particles matter",
+  O3: "Ozone",
+  CO: "Carbon monoxide",
+  NO: "Nitrogen monoxide",
+  NH3: "Ammonia",
+};
