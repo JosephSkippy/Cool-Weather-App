@@ -50,8 +50,8 @@ function App() {
 
   return (
     <TooltipProvider>
-      <div className="flex flex-col gap-3 px-6 py-3 w-[calc(100dvw-var(--sidebar-width))] h-screen overflow-hidden">
-        <div className="flex items-center gap-4 px-3 py-1 rounded-lg bg-card/50 backdrop-blur-sm">
+      <div className="flex flex-col gap-2 px-6 py-2 w-[calc(100dvw-var(--sidebar-width))] h-screen overflow-hidden">
+        <div className="flex items-center gap-4 px-3 py-0 rounded-lg bg-card/50 backdrop-blur-sm">
           <div className="flex items-center gap-1.5">
             <span className="text-xs font-medium text-muted-foreground">
               Location
@@ -70,7 +70,7 @@ function App() {
           </div>
           <ThemeToggle />
         </div>
-        <div className="grid flex-1 min-h-0 grid-cols-4 grid-rows-[1fr_minmax(0,180px)_minmax(0,180px)] gap-4">
+        <div className="grid flex-1 min-h-0 grid-cols-4 grid-rows-[1.3fr_minmax(0,149px)_minmax(0,149px)] gap-3">
           <div className="relative col-span-4 min-h-0">
             <Map coord={coord} onMapClick={mapClick} mapType={mapType} />
             {shouldShowLegend && <MapLegend mapType={mapType} />}

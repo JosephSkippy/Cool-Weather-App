@@ -17,11 +17,11 @@ export default function Card({
   return (
     <div
       className={cn(
-        "p-3 rounded-xl bg-card flex flex-col gap-2 h-full border border-border/30 dark:border-border/10 overflow-hidden",
+        "p-2 rounded-xl bg-card flex flex-col gap-0 h-full border border-border/30 dark:border-border/10 overflow-hidden",
         className,
       )}
     >
-      {title && <h2 className="text-lg font-semibold">{title}</h2>}
+      {title && <h2 className="text-base font-semibold">{title}</h2>}
       <div
         className={cn(
           "animate-[fade-in_1s_ease-out_forwards] flex-1 min-h-0 overflow-hidden",

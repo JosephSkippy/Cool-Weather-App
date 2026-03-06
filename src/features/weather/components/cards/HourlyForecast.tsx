@@ -25,7 +25,7 @@ export default function HourlyForecast({ coord }: Props) {
               key={hour.dt}
               className="flex flex-col justify-between gap-2 items-center p-2"
             >
-              <p className="whitespace-nowrap text-sm">
+              <p className="whitespace-nowrap text-[10px]">
                 {new Date(hour.dt * 1000).toLocaleTimeString(undefined, {
                   hour: "numeric",
                   minute: "2-digit",
@@ -33,7 +33,7 @@ export default function HourlyForecast({ coord }: Props) {
                 })}
               </p>
               <WeatherIcon img={hour.weather[0].icon} className="size-10" />
-              <p className="text-sm">{Math.round(hour.temp)}°C</p>
+              <p className="text-[10px]">{Math.round(hour.temp)}°C</p>
             </div>
           ))}
         </div>

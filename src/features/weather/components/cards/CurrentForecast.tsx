@@ -20,7 +20,7 @@ export default function CurrentForecast({ coord }: Props) {
       title="Current Weather"
       childrenClassName="flex flex-col items-center gap-3 justify-between"
     >
-      <div className="flex flex-col gap-1 items-center">
+      <div className="flex flex-col gap-1 items-center mt-2">
         <h2 className="text-4xl font-semibold text-center">
           {Math.round(data.current.temp)}°C
         </h2>
