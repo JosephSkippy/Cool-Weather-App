@@ -27,12 +27,12 @@ export default function AdditionalInfo({ coord }: Props) {
       childrenClassName="grid grid-cols-2 gap-3"
     >
       {rows.map(({ label, value, Icon }) => (
-        <div className="flex justify-between" key={value}>
-          <div className="flex gap-4 items-center">
-            <span className="text-gray-500">{label}</span>
-            <Icon className="size-8" />
+        <div className="flex items-center gap-3" key={value}>
+          <div className="size-6 shrink-0 flex items-center justify-center">
+            <Icon className="size-full" />
           </div>
-          <span>
+          <span className="text-gray-500 flex-1 truncate">{label}</span>
+          <span className="shrink-0 text-right">
             <FormatValue value={value} number={data.current[value]} />
           </span>
         </div>

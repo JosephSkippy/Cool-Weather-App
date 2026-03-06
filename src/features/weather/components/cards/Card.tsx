@@ -17,7 +17,7 @@ export default function Card({
   return (
     <div
       className={cn(
-        "p-3 rounded-xl bg-linear-to-br from-card to-card/60 shadow-md flex flex-col gap-2 h-full border dark:border-none overflow-hidden",
+        "p-3 rounded-xl bg-card flex flex-col gap-2 h-full border border-border/30 dark:border-border/10 overflow-hidden",
         className,
       )}
     >

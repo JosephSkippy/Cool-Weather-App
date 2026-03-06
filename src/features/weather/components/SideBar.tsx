@@ -20,7 +20,7 @@ type Props = {
 
 export default function SideBar({ coord }: Props) {
   return (
-    <div className="fixed top-0 right-0 h-screen w-(--sidebar-width) shadow-md bg-sidebar z-1001 py-8 px-4 overflow-y-scroll">
+    <div className="fixed top-0 right-0 h-screen w-(--sidebar-width) bg-sidebar border-l border-border/40 dark:border-border/10 z-1001 py-8 px-4 overflow-y-scroll">
       <Suspense fallback={<SideBarSkeleton />}>
         <AirPollution coord={coord} />
       </Suspense>
