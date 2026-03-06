@@ -1,10 +1,22 @@
 import "@maptiler/leaflet-maptilersdk";
 import { MaptilerLayer } from "@maptiler/leaflet-maptilersdk";
 import type { LeafletMouseEvent } from "leaflet";
+import L from "leaflet";
+import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
+import markerIcon from "leaflet/dist/images/marker-icon.png";
+import markerShadow from "leaflet/dist/images/marker-shadow.png";
 import { useEffect, useState } from "react";
 import { MapContainer, Marker, TileLayer, useMap } from "react-leaflet";
 import type { Coord } from "../coord";
 import type { MapType } from "./dropdowns/MapTypeDropdown";
+
+// Fix Leaflet default marker icons broken by bundlers
+delete (L.Icon.Default.prototype as any)._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconUrl: markerIcon,
+  iconRetinaUrl: markerIcon2x,
+  shadowUrl: markerShadow,
+});
 
 const API_KEY = import.meta.env.VITE_OPENWEATHER_API_KEY;
 const zoomLevel = 5;
