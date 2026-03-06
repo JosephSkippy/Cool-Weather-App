@@ -18,7 +18,6 @@ L.Icon.Default.mergeOptions({
   shadowUrl: markerShadow,
 });
 
-const API_KEY = import.meta.env.VITE_OPENWEATHER_API_KEY;
 const zoomLevel = 5;
 const MAPTILES_API_KEY = import.meta.env.VITE_MAPTILES_API_KEY;
 
@@ -44,7 +43,7 @@ export default function Map({ coord, onMapClick, mapType }: Props) {
       <MapTiles />
       <TileLayer
         opacity={0.7}
-        url={`https://tile.openweathermap.org/map/${mapType}/${zoomLevel}/{x}/{y}.png?appid=${API_KEY}`}
+        url={`/api/map-tile/${mapType}/${zoomLevel}/{x}/{y}`}
       />
       <Marker position={coord}></Marker>
     </MapContainer>

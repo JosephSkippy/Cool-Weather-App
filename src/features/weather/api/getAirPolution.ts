@@ -1,7 +1,5 @@
 import { AirPollutionSchema } from "../schemas/airPollutionSchema";
 
-const API_KEY = import.meta.env.VITE_OPENWEATHER_API_KEY;
-
 export async function getAirPolution({
   lat,
   lon,
@@ -9,9 +7,7 @@ export async function getAirPolution({
   lat: number;
   lon: number;
 }) {
-  const result = await fetch(
-    `https://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=${API_KEY}`,
-  );
+  const result = await fetch(`/api/air-pollution?lat=${lat}&lon=${lon}`);
 
   const json = await result.json();
 
