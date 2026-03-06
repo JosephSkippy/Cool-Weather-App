@@ -45,7 +45,7 @@ app.get("/api/map-tile/:layer/:z/:x/:y", async (req, res) => {
   res.send(buffer);
 });
 
-// Serve static Vite build
+// Serve static Vite buildss
 app.use(express.static(path.join(__dirname, "dist")));
 app.get("/{*path}", (_req, res) => {
   res.sendFile(path.join(__dirname, "dist", "index.html"));
